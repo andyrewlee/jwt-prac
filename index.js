@@ -28,10 +28,23 @@ app.post('/signup', (req, res) => {
 
 app.post('/login', (req, res) => {
   // get username and password
-  // hash password
-  // compare hashed password with encrypted password in database
-  // if they are the same return token to user
+  const username = req.body.username;
+  const password = req.body.password;
+
+  models.User.findOne({ where: { username }}).then((user) => {
+    const encryptedPassword = user.dataValues.encryptedPassword;
+
+    // if they are the same return token to user
+    bcrypt.compare(password, encryptedPassword, (err, result) => {
+      if (result) {
+        res.json({ success: true });
+      } else {
+        res.json({ success: false });
+      }
+    });
+  });
 });
+
 
 app.get('/secret-route', (req, res) => {
   // check for token in header
