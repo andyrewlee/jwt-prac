@@ -1,7 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const models = require('./models');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+const models = require('./models');
 
 const saltRounds = 10;
 const app = express();
@@ -37,7 +39,8 @@ app.post('/login', (req, res) => {
     // if they are the same return token to user
     bcrypt.compare(password, encryptedPassword, (err, result) => {
       if (result) {
-        res.json({ success: true });
+        const token = jwt.sign({ username }, 'supersecret', { expiresIn: 1200000 });
+        res.send({ token });
       } else {
         res.json({ success: false });
       }
@@ -48,7 +51,14 @@ app.post('/login', (req, res) => {
 
 app.get('/secret-route', (req, res) => {
   // check for token in header
+  const token = req.headers.authorization;
+
   // if token is valid, then return the data
+  jwt.verify(token, 'supersecret', (err, decoded) => {
+    if (decoded) {
+      res.json({ message: 'Secret message' })
+    }
+  });
 });
 
 app.listen(3000);
