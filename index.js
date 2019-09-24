@@ -2,13 +2,16 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const cors = require('cors')
 
 const models = require('./models');
 
 const saltRounds = 10;
 const app = express();
 
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
   res.json({ success: true });
